@@ -90,6 +90,7 @@ def evaluate_gci(N_cells, values, dimension=2):
     else:
         print("Convergence State    : [X] Divergence")
         print("[ERROR] Cannot calculate reliable GCI for diverging grids.")
+        print(R)
         return
 
     print(f"Order of Conv. (p)   : {p:.4f}")
@@ -105,6 +106,9 @@ def evaluate_gci(N_cells, values, dimension=2):
     err21 = abs((phi[0] - phi[1]) / phi[0])
     gci_fine = (Fs * err21) / (r21**p - 1.0)
     
+    # Calculate GCI of the Medium mesh (relative to the Fine mesh)
+    gci_medium = gci_fine * (r21**p)
+    
     # Coarse Grid GCI
     err32 = abs((phi[1] - phi[2]) / phi[1])
     gci_coarse = (Fs * err32) / (r32**p - 1.0)
@@ -118,6 +122,7 @@ def evaluate_gci(N_cells, values, dimension=2):
     print(f"Approx Relative Err  : {err21 * 100:.4f} %")
     print(f"GCI (Fine Grid)      : {gci_fine * 100:.4f} %")
     print(f"GCI (Coarse Grid)    : {gci_coarse * 100:.4f} %")
+    print(f"GCI (Medium Grid)    : {gci_medium * 100:.4f} %")
     print(f"Asymptotic Ratio     : {asymptotic_ratio:.4f} (Target: ~1.0)")
     print("======================================================\n")
 
@@ -150,7 +155,7 @@ def evaluate_gci(N_cells, values, dimension=2):
     
     # Reverse X-axis so it reads left-to-right from coarse to fine to extrapolated
     plt.xlim(max(x_vals) * 1.1, -0.05 * max(x_vals)) 
-    
+
     plt.tight_layout()
     plt.show()
 
@@ -160,11 +165,11 @@ if __name__ == "__main__":
     # Ensure vectors are strictly ordered: [Fine, Medium, Coarse]
     
     # Example cell counts from snappyHexMesh
-    cells_vector = [220000, 105000, 48000] 
+    cells_vector = [153212621, 59529198, 27000000] 
     
     # Example extracted values (e.g., Cd, Cl, or Pressure Drop)
-    values_vector = [0.3347, 0.3349, 0.3353]
+    values_vector = [5.7089 ,5.7500, 5.5297]
     
     # Run the evaluator
     # Set dimension=2 for 2D airfoils, dimension=3 for full 3D models
-    evaluate_gci(N_cells=cells_vector, values=values_vector, dimension=2)
+    evaluate_gci(N_cells=cells_vector, values=values_vector, dimension=3)
